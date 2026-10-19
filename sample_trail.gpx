@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="ApexTrack GPX Studio - https://github.com"
+  xmlns="http://www.topografix.com/GPX/1/1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Chamonix - Lac Blanc Alpine Loop</name>
+    <desc>High altitude circuit in the French Alps facing Mont Blanc.</desc>
+    <time>2026-10-19T13:40:25.200Z</time>
+  </metadata>
+  <wpt lat="45.9237000" lon="6.8694000">
+    <ele>1035.0</ele>
+    <name>Chamonix Trailhead</name>
+    <desc>Start point at valley floor</desc>
+    <sym>Trailhead</sym>
+  </wpt>
+  <wpt lat="45.9451000" lon="6.8870000">
+    <ele>1710.0</ele>
+    <name>Chalet de la Floria</name>
+    <desc>Panoramic view cafe</desc>
+    <sym>Food</sym>
+  </wpt>
+  <wpt lat="45.9642000" lon="6.9065000">
+    <ele>2352.0</ele>
+    <name>Refuge du Lac Blanc</name>
+    <desc>Glacial alpine lake &amp; Mont Blanc view</desc>
+    <sym>Summit</sym>
+  </wpt>
+  <wpt lat="45.9515000" lon="6.9190000">
+    <ele>1980.0</ele>
+    <name>Flégère Ridge Spring</name>
+    <desc>Natural water source</desc>
+    <sym>Water</sym>
+  </wpt>
+  <trk>
+    <name>Chamonix - Lac Blanc Alpine Loop</name>
+    <trkseg>
+      <trkpt lat="45.9237000" lon="6.8694000">
+        <ele>1035.0</ele>
+        <time>2026-07-15T07:30:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9268000" lon="6.8732000">
+        <ele>1120.0</ele>
+        <time>2026-07-15T07:44:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9312000" lon="6.8778000">
+        <ele>1240.0</ele>
+        <time>2026-07-15T08:02:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9355000" lon="6.8812000">
+        <ele>1390.0</ele>
+        <time>2026-07-15T08:24:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9402000" lon="6.8835000">
+        <ele>1540.0</ele>
+        <time>2026-07-15T08:48:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9451000" lon="6.8870000">
+        <ele>1710.0</ele>
+        <time>2026-07-15T09:15:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9498000" lon="6.8905000">
+        <ele>1875.0</ele>
+        <time>2026-07-15T09:40:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9542000" lon="6.8924000">
+        <ele>2040.0</ele>
+        <time>2026-07-15T10:06:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9587000" lon="6.8962000">
+        <ele>2180.0</ele>
+        <time>2026-07-15T10:32:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9615000" lon="6.9010000">
+        <ele>2280.0</ele>
+        <time>2026-07-15T10:50:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9642000" lon="6.9065000">
+        <ele>2352.0</ele>
+        <time>2026-07-15T11:05:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9658000" lon="6.9120000">
+        <ele>2365.0</ele>
+        <time>2026-07-15T11:18:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9620000" lon="6.9180000">
+        <ele>2240.0</ele>
+        <time>2026-07-15T11:35:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9570000" lon="6.9205000">
+        <ele>2110.0</ele>
+        <time>2026-07-15T11:55:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9515000" lon="6.9190000">
+        <ele>1980.0</ele>
+        <time>2026-07-15T12:15:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9470000" lon="6.9150000">
+        <ele>1820.0</ele>
+        <time>2026-07-15T12:35:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9410000" lon="6.9080000">
+        <ele>1640.0</ele>
+        <time>2026-07-15T12:58:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9340000" lon="6.8990000">
+        <ele>1420.0</ele>
+        <time>2026-07-15T13:20:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9280000" lon="6.8850000">
+        <ele>1210.0</ele>
+        <time>2026-07-15T13:42:00Z</time>
+      </trkpt>
+      <trkpt lat="45.9242000" lon="6.8710000">
+        <ele>1045.0</ele>
+        <time>2026-07-15T14:02:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

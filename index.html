@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ApexTrack - GPX Studio & Interactive Track Editor</title>
+    <meta name="description" content="Load, edit, visualize, simplify, and export GPX tracks on an interactive topographic 3D map with elevation profiles and stats." />
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Drag and Drop Fullscreen Overlay -->
+    <div id="drop-overlay" class="drop-overlay">
+      <div class="drop-message">
+        <div class="drop-icon">📂</div>
+        <h2>Drop GPX File to Load</h2>
+        <p>Supports .gpx, .xml, and .kml formats</p>
+      </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-layout">
+      
+      <!-- Top Navigation & Action Header -->
+      <header class="top-nav glass-panel">
+        <div class="nav-brand">
+          <div class="brand-logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">Apex<span class="brand-highlight">Track</span></span>
+            <span class="brand-badge">GPX STUDIO</span>
+          </div>
+        </div>
+
+        <!-- Editable Route Name -->
+        <div class="route-title-box">
+          <input type="text" id="route-name-input" class="route-name-input" value="Chamonix - Lac Blanc Alpine Loop" title="Click to rename route" />
+          <span class="edit-icon">✏️</span>
+        </div>
+
+        <!-- Center Tool Modes -->
+        <div class="tool-modes glass-subpanel" role="toolbar" aria-label="Editor Modes">
+          <button id="tool-select" class="tool-btn active" title="Select & Drag Points (Click midpoint '+' to add vertices)" data-mode="select">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="m13 13 6 6"/></svg>
+            <span>Move</span>
+          </button>
+          <button id="tool-draw" class="tool-btn" title="Click on map to extend or draw trail" data-mode="draw">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            <span>Draw</span>
+          </button>
+          <button id="tool-delete" class="tool-btn" title="Click any vertex to delete it" data-mode="delete">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+            <span>Delete</span>
+          </button>
+          <button id="tool-waypoint" class="tool-btn" title="Click on map to place a POI or Waypoint" data-mode="waypoint">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Waypoint</span>
+          </button>
+        </div>
+
+        <!-- History Actions: Undo / Redo -->
+        <div class="history-controls">
+          <button id="btn-undo" class="icon-btn" title="Undo (Ctrl+Z / Cmd+Z)" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+          </button>
+          <button id="btn-redo" class="icon-btn" title="Redo (Ctrl+Y / Cmd+Shift+Z)" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+          </button>
+        </div>
+
+        <!-- Top Right Actions -->
+        <div class="nav-actions">
+          <!-- Sample Tracks Dropdown -->
+          <div class="dropdown-container">
+            <button id="btn-samples-menu" class="btn btn-secondary" title="Load demo GPX routes">
+              <span>⚡ Samples</span>
+            </button>
+            <div id="samples-dropdown" class="dropdown-menu">
+              <button class="dropdown-item" data-sample="lac_blanc">
+                <strong>Chamonix - Lac Blanc Loop</strong>
+                <small>French Alps • 12.8 km • +1,320m</small>
+              </button>
+              <button class="dropdown-item" data-sample="yosemite">
+                <strong>Yosemite Mist & Nevada Falls</strong>
+                <small>California • 8.6 km • +640m</small>
+              </button>
+              <button class="dropdown-item" data-sample="tre_cime">
+                <strong>Dolomites - Tre Cime Loop</strong>
+                <small>Italy • 9.8 km • +480m</small>
+              </button>
+            </div>
+          </div>
+
+          <!-- Open GPX File -->
+          <label for="gpx-file-input" class="btn btn-secondary file-upload-label" title="Load GPX file from your computer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            <span>Open GPX</span>
+          </label>
+          <input type="file" id="gpx-file-input" accept=".gpx,.xml,.kml" style="display: none;" />
+
+          <!-- Export Button -->
+          <button id="btn-export-open" class="btn btn-primary" title="Export edited GPX / GeoJSON / KML">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            <span>Export GPX</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Map Area -->
+      <main class="map-wrapper">
+        <div id="map-container" class="map-container mode-select"></div>
+
+        <!-- Floating Glass Stats HUD Card -->
+        <aside class="stats-hud glass-panel" aria-label="Route Statistics">
+          <div class="stats-grid">
+            <div class="stat-card" title="Total trail distance">
+              <span class="stat-label">DISTANCE</span>
+              <span id="stat-distance" class="stat-value">0.00 km</span>
+            </div>
+            <div class="stat-card" title="Cumulative elevation ascent">
+              <span class="stat-label">ELEV GAIN ↗</span>
+              <span id="stat-gain" class="stat-value text-emerald">+0 m</span>
+            </div>
+            <div class="stat-card" title="Cumulative elevation descent">
+              <span class="stat-label">ELEV LOSS ↘</span>
+              <span id="stat-loss" class="stat-value text-rose">-0 m</span>
+            </div>
+            <div class="stat-card" title="Highest and lowest altitude">
+              <span class="stat-label">ALT RANGE</span>
+              <span id="stat-altrange" class="stat-value">0 - 0 m</span>
+            </div>
+            <div class="stat-card" title="Estimated trail time">
+              <span class="stat-label">EST. TIME</span>
+              <span id="stat-time" class="stat-value">0m</span>
+            </div>
+            <div class="stat-card" title="Total GPS track points">
+              <span class="stat-label">POINTS</span>
+              <span id="stat-points" class="stat-value">0</span>
+            </div>
+          </div>
+
+          <!-- Quick Action Tools Row -->
+          <div class="stats-actions">
+            <button id="btn-simulate-trip" class="hud-action-btn hud-action-sim" title="Simulate trip playback with live cockpit telemetry">
+              <span>▶️ Simulate Trip</span>
+            </button>
+            <button id="btn-snap-modal" class="hud-action-btn hud-action-accent" title="Snap sparse GPS points to streets/trails and fill gaps">
+              <span>🛣️ Snap to Streets</span>
+            </button>
+            <button id="btn-reverse" class="hud-action-btn" title="Reverse track direction">
+              <span>⇄ Reverse</span>
+            </button>
+            <button id="btn-simplify-modal" class="hud-action-btn" title="Reduce point count while maintaining shape">
+              <span>📉 Simplify</span>
+            </button>
+            <button id="btn-smooth-ele" class="hud-action-btn" title="Smooth elevation profile filter">
+              <span>〰️ Smooth Alt</span>
+            </button>
+            <button id="btn-fit-map" class="hud-action-btn" title="Center map to track bounds">
+              <span>🎯 Fit View</span>
+            </button>
+            <button id="btn-clear-track" class="hud-action-btn text-danger" title="Clear track and start fresh">
+              <span>🗑️ Clear</span>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Selected Point Inspector Floating Card -->
+        <div id="point-inspector" class="point-inspector glass-panel" style="display: none;">
+          <div class="inspector-header">
+            <h4>Point <span id="insp-index">#1</span></h4>
+            <button id="btn-insp-close" class="close-btn">&times;</button>
+          </div>
+          <div class="inspector-body">
+            <div class="insp-row">
+              <span class="insp-lbl">Distance:</span>
+              <span id="insp-dist" class="insp-val">0.0 km</span>
+            </div>
+            <div class="insp-row">
+              <span class="insp-lbl">Elevation:</span>
+              <input type="number" id="insp-ele-input" class="insp-input" value="1200" step="1" />
+              <span class="insp-unit">m</span>
+            </div>
+            <div class="insp-row">
+              <span class="insp-lbl">Latitude:</span>
+              <span id="insp-lat" class="insp-val">45.00000</span>
+            </div>
+            <div class="insp-row">
+              <span class="insp-lbl">Longitude:</span>
+              <span id="insp-lon" class="insp-val">6.00000</span>
+            </div>
+          </div>
+          <div class="inspector-footer">
+            <button id="btn-insp-delete" class="btn btn-danger-sm">Delete Point</button>
+          </div>
+        </div>
+
+        <!-- Floating Trip Simulation Cockpit Dock -->
+        <div id="simulation-bar" class="simulation-bar glass-panel" style="display: none;">
+          <div class="sim-cockpit-header">
+            <div class="sim-cockpit-title">
+              <span class="sim-live-beacon"></span>
+              <strong>TRIP SIMULATION</strong>
+              <span id="sim-status-badge" class="sim-badge">PAUSED</span>
+            </div>
+            <div class="sim-telemetry-readouts">
+              <div class="sim-telemetry-item">
+                <span class="sim-telemetry-label">SPEED</span>
+                <span id="sim-telemetry-speed" class="sim-telemetry-val">0.0 km/h</span>
+              </div>
+              <div class="sim-telemetry-item">
+                <span class="sim-telemetry-label">TIME</span>
+                <span id="sim-telemetry-time" class="sim-telemetry-val">00:00:00</span>
+              </div>
+              <div class="sim-telemetry-item">
+                <span class="sim-telemetry-label">DISTANCE</span>
+                <span id="sim-telemetry-dist" class="sim-telemetry-val">0.00 / 0.00 km</span>
+              </div>
+              <div class="sim-telemetry-item">
+                <span class="sim-telemetry-label">ELEVATION</span>
+                <span id="sim-telemetry-ele" class="sim-telemetry-val">0 m</span>
+              </div>
+              <div class="sim-telemetry-item">
+                <span class="sim-telemetry-label">SLOPE</span>
+                <span id="sim-telemetry-grade" class="sim-telemetry-val">0.0%</span>
+              </div>
+            </div>
+            <button id="btn-sim-close" class="close-btn" title="Exit Simulation (Esc)">&times;</button>
+          </div>
+
+          <!-- Scrubber & Controls Row -->
+          <div class="sim-controls-row">
+            <div class="sim-playback-buttons">
+              <button id="btn-sim-playpause" class="sim-btn-playpause" title="Play / Pause (Spacebar)">
+                <svg id="sim-icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <svg id="sim-icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              </button>
+              <button id="btn-sim-restart" class="sim-btn-icon" title="Restart simulation from 0km">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              </button>
+            </div>
+
+            <div class="sim-scrubber-track">
+              <input type="range" id="sim-progress-slider" min="0" max="1000" value="0" step="1" class="sim-slider" title="Seek trip progress" />
+            </div>
+
+            <span id="sim-progress-pct" class="sim-pct-badge">0.0%</span>
+
+            <!-- Speed Multiplier Pills -->
+            <div class="sim-speed-group" title="Playback speed multiplier">
+              <button class="sim-speed-btn" data-speed="1">1x</button>
+              <button class="sim-speed-btn" data-speed="5">5x</button>
+              <button class="sim-speed-btn active" data-speed="15">15x</button>
+              <button class="sim-speed-btn" data-speed="50">50x</button>
+              <button class="sim-speed-btn" data-speed="150">150x</button>
+            </div>
+
+            <!-- Follow Camera Checkbox -->
+            <label class="sim-follow-checkbox" title="Smoothly center map on traveler position">
+              <input type="checkbox" id="sim-camera-follow" checked />
+              <span>Follow</span>
+            </label>
+          </div>
+        </div>
+      </main>
+
+      <!-- Bottom Interactive Elevation Profile Dock -->
+      <footer class="elevation-dock glass-panel">
+        <div class="elevation-dock-header">
+          <div class="elevation-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Elevation Profile & Slope Grade</span>
+          </div>
+
+          <div class="elevation-controls">
+            <!-- Unit Toggle -->
+            <div class="unit-toggle" id="unit-toggle-group">
+              <button class="unit-btn active" data-unit="metric">Metric (km/m)</button>
+              <button class="unit-btn" data-unit="imperial">Imperial (mi/ft)</button>
+            </div>
+
+            <!-- Minimize / Expand Toggle -->
+            <button id="btn-toggle-elevation" class="icon-btn-sm" title="Toggle elevation panel">
+              <svg id="elevation-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="elevation-canvas-container" class="elevation-canvas-container">
+          <canvas id="elevation-canvas"></canvas>
+        </div>
+      </footer>
+
+    </div>
+
+    <!-- Export Modal -->
+    <dialog id="export-dialog" class="modal-dialog glass-panel">
+      <div class="modal-header">
+        <h3>Export Route</h3>
+        <button id="btn-close-export" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="export-filename">File Name</label>
+          <input type="text" id="export-filename" class="text-input" value="edited-route" />
+        </div>
+        <div class="form-group">
+          <label>Export Format</label>
+          <div class="format-options">
+            <label class="radio-card active">
+              <input type="radio" name="export-format" value="gpx" checked />
+              <div class="radio-content">
+                <strong>GPX 1.1</strong>
+                <small>Standard for GPS devices, Garmin, Strava, Komoot</small>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="export-format" value="geojson" />
+              <div class="radio-content">
+                <strong>GeoJSON</strong>
+                <small>Web mapping, QGIS, Mapbox, modern GIS</small>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="export-format" value="kml" />
+              <div class="radio-content">
+                <strong>KML</strong>
+                <small>Google Earth, 3D terrain flythroughs</small>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="export-speed-select">Timestamp / Pace Recalculation</label>
+          <select id="export-speed-select" class="select-input">
+            <option value="0">Preserve Original Timestamps</option>
+            <option value="4.5">Hiking Pace (4.5 km/h)</option>
+            <option value="10">Trail Running Pace (10 km/h)</option>
+            <option value="18">Mountain Biking Pace (18 km/h)</option>
+            <option value="26">Road Cycling Pace (26 km/h)</option>
+          </select>
+        </div>
+        <div class="form-group checkbox-row">
+          <label class="custom-checkbox">
+            <input type="checkbox" id="export-include-wpt" checked />
+            <span class="checkmark"></span>
+            Include Waypoints / POIs
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-cancel-export" class="btn btn-secondary">Cancel</button>
+        <button id="btn-confirm-export" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          <span>Download File</span>
+        </button>
+      </div>
+    </dialog>
+
+    <!-- Simplify Track Modal -->
+    <dialog id="simplify-dialog" class="modal-dialog glass-panel">
+      <div class="modal-header">
+        <h3>Simplify Track Points</h3>
+        <button id="btn-close-simplify" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Uses Douglas-Peucker algorithm to remove redundant points and jitter while preserving track shape.
+        </p>
+        <div class="form-group">
+          <div class="slider-header">
+            <label for="simplify-tolerance">Tolerance (Sensibility)</label>
+            <span id="simplify-tolerance-val">5 m</span>
+          </div>
+          <input type="range" id="simplify-tolerance" min="1" max="50" value="5" step="1" class="slider-input" />
+        </div>
+        <div class="simplify-stats-box">
+          <div class="simplify-stat">
+            <span class="sub-label">Original Points</span>
+            <span id="simplify-orig-pts" class="sub-val">0</span>
+          </div>
+          <div class="simplify-stat-arrow">➔</div>
+          <div class="simplify-stat">
+            <span class="sub-label">Simplified Points</span>
+            <span id="simplify-new-pts" class="sub-val text-emerald">0</span>
+          </div>
+          <div class="simplify-stat">
+            <span class="sub-label">Reduction</span>
+            <span id="simplify-reduction-pct" class="sub-val text-emerald">-0%</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-cancel-simplify" class="btn btn-secondary">Cancel</button>
+        <button id="btn-confirm-simplify" class="btn btn-primary">Apply Simplification</button>
+      </div>
+    </dialog>
+
+    <!-- Snap to Streets (Fill Gaps) Modal -->
+    <dialog id="snap-dialog" class="modal-dialog glass-panel">
+      <div class="modal-header">
+        <h3>🛣️ Snap Track to Streets</h3>
+        <button id="btn-close-snap" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Reconstructs street-accurate geometry between sparse GPS points using OpenStreetMap routing and interpolates timestamps proportionally along the road.
+        </p>
+        <div class="form-group">
+          <label>Activity / Routing Mode</label>
+          <div class="format-options">
+            <label class="radio-card active">
+              <input type="radio" name="snap-profile" value="bike" checked />
+              <div class="radio-content">
+                <strong>🚴 Cycling (Bicycle &amp; Cycleways)</strong>
+                <small>Follows bike lanes, cycle tracks, and bike-friendly streets</small>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="snap-profile" value="foot" />
+              <div class="radio-content">
+                <strong>🥾 Walking / Trail Running</strong>
+                <small>Follows footpaths, pedestrian walkways, parks, and trails</small>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="snap-profile" value="car" />
+              <div class="radio-content">
+                <strong>🚗 Driving / Road Vehicle</strong>
+                <small>Follows standard motor vehicle streets and highways</small>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group checkbox-row">
+          <label class="custom-checkbox">
+            <input type="checkbox" id="snap-filter-outliers" checked />
+            <span class="checkmark"></span>
+            Filter GPS / Wi-Fi Jump Outliers (removes sudden teleportation spikes)
+          </label>
+        </div>
+
+        <div class="form-group checkbox-row">
+          <label class="custom-checkbox">
+            <input type="checkbox" id="snap-detour-guard" checked />
+            <span class="checkmark"></span>
+            Smart Detour Guard (prevents unnatural bridge/river loops)
+          </label>
+        </div>
+
+        <div class="form-group checkbox-row">
+          <label class="custom-checkbox">
+            <input type="checkbox" id="snap-show-overlay" checked />
+            <span class="checkmark"></span>
+            Show Original Track Comparison Overlay (dashed cyan line)
+          </label>
+        </div>
+
+        <div id="snap-progress-box" class="snap-progress-box" style="display: none;">
+          <div class="snap-progress-header">
+            <span id="snap-progress-text">Routing along street network...</span>
+            <span id="snap-progress-pct">0%</span>
+          </div>
+          <div class="snap-progress-bar-bg">
+            <div id="snap-progress-bar-fill" class="snap-progress-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-cancel-snap" class="btn btn-secondary">Cancel</button>
+        <button id="btn-confirm-snap" class="btn btn-primary">
+          <span>🛣️ Snap to Streets</span>
+        </button>
+      </div>
+    </dialog>
+
+    <!-- Add Waypoint Modal -->
+    <dialog id="waypoint-dialog" class="modal-dialog glass-panel">
+      <div class="modal-header">
+        <h3>Add Waypoint / POI</h3>
+        <button id="btn-close-wpt-dialog" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="wpt-name-input">Waypoint Name</label>
+          <input type="text" id="wpt-name-input" class="text-input" placeholder="e.g. Scenic Overlook, Water Spring" />
+        </div>
+        <div class="form-group">
+          <label for="wpt-sym-select">Icon / Category</label>
+          <select id="wpt-sym-select" class="select-input">
+            <option value="Summit">⛰️ Summit / High Point</option>
+            <option value="Viewpoint">🔭 Scenic Viewpoint</option>
+            <option value="Water">💧 Water Source / Spring</option>
+            <option value="Camp">⛺ Campsite / Shelter</option>
+            <option value="Food">🍴 Food / Cafe / Refuge</option>
+            <option value="Trailhead">🚩 Trailhead / Start</option>
+            <option value="Danger">⚠️ Caution / Hazard</option>
+            <option value="Flag">📍 General Pin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="wpt-desc-input">Notes / Description (Optional)</label>
+          <textarea id="wpt-desc-input" class="text-input" rows="2" placeholder="Helpful details, potable water notes, etc."></textarea>
+        </div>
+        <div class="coords-row" id="wpt-coords-display">
+          Lat: 0.00000, Lon: 0.00000
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-cancel-wpt" class="btn btn-secondary">Cancel</button>
+        <button id="btn-confirm-wpt" class="btn btn-primary">Place Waypoint</button>
+      </div>
+    </dialog>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
