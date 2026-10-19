@@ -1,6 +1,10 @@
 # ApexTrack - Interactive GPX Studio & Track Editor
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-https%3A%2F%2Fgugasv.github.io%2Fapex--track%2F-00e5ff?style=for-the-badge&logo=githubpages&logoColor=white)](https://gugasv.github.io/apex-track/)
+
 **ApexTrack** is a modern, high-performance web application designed to load, visualize, edit, simplify, and export GPX tracks on top of interactive topographic and satellite maps with synchronized elevation profiles.
+
+🌐 **Live URL**: [https://gugasv.github.io/apex-track/](https://gugasv.github.io/apex-track/)
 
 ---
 
