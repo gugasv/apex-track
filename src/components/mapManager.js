@@ -4,6 +4,7 @@
 
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { escapeHtml } from '../utils/html.js';
 
 // Fix Leaflet's default icon path issue with bundlers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -355,7 +356,7 @@ export class MapManager {
         html: `
           <div class="waypoint-badge">
             <span class="wpt-icon">${iconChar}</span>
-            <span class="wpt-title">${wpt.name || 'POI'}</span>
+            <span class="wpt-title">${escapeHtml(wpt.name || 'POI')}</span>
           </div>
         `,
         iconSize: [40, 36],
@@ -370,8 +371,8 @@ export class MapManager {
       const popupContent = document.createElement('div');
       popupContent.className = 'wpt-popup';
       popupContent.innerHTML = `
-        <h4 style="margin: 0 0 6px 0; color: #ff6b35;">${wpt.name}</h4>
-        <p style="margin: 0 0 8px 0; font-size: 12px; color: #cbd5e1;">${wpt.desc || 'No description'}</p>
+        <h4 style="margin: 0 0 6px 0; color: #ff6b35;">${escapeHtml(wpt.name)}</h4>
+        <p style="margin: 0 0 8px 0; font-size: 12px; color: #cbd5e1;">${escapeHtml(wpt.desc || 'No description')}</p>
         <div style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">
           Alt: ${wpt.ele ? wpt.ele + 'm' : 'N/A'}<br>
           Lat: ${wpt.lat.toFixed(5)}, Lon: ${wpt.lon.toFixed(5)}

@@ -29,10 +29,16 @@ export function showToast(message, type = 'info', duration = 3000) {
     error: '❌'
   };
 
-  toast.innerHTML = `
-    <span class="toast-icon">${icons[type] || '🔔'}</span>
-    <span class="toast-msg">${message}</span>
-  `;
+  // Messages often carry track/waypoint names from imported files, so they are set as text, never HTML
+  const iconEl = document.createElement('span');
+  iconEl.className = 'toast-icon';
+  iconEl.textContent = icons[type] || '🔔';
+
+  const msgEl = document.createElement('span');
+  msgEl.className = 'toast-msg';
+  msgEl.textContent = message;
+
+  toast.append(iconEl, msgEl);
 
   container.appendChild(toast);
 
